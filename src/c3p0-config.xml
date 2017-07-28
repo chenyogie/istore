@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- c3p0-config是配置文件的根标签 -->
+<c3p0-config>
+	
+	<!-- 默认配置 -->
+	<default-config>
+		<property name="driverClass">com.mysql.jdbc.Driver</property>
+		<property name="jdbcUrl">jdbc:mysql://localhost:3306/istore</property>
+		<property name="user">lily</property>
+		<property name="password">lily123</property>
+	</default-config>
+	
+</c3p0-config>

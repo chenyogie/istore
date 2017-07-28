@@ -1,0 +1,198 @@
+
+istore 购物商城功能分析
+
+	1， 用户注册
+		a， 前端js校验
+		b， 验证码验证
+		c， 发送注册电子邮件
+	2， 用户激活
+	3， 用户登录
+		a， 记住用户名
+		b， 一周（一月）自动登录
+	4， 添加商品
+		a， 上传商品图片（文件上传）
+	5, 查看商品列表
+		a， 分页查询
+	6， 查看商品详情
+		a， 新页面显示商品详细信息
+	7， 把商品加入购物车
+		a， 购物车中数据的存储（Cookie， Session， 数据库）
+	8， 对购物车中的商品进行CRUD操作
+	9， 生成订单
+		a， 表间关系
+	10， 查询订单
+	11， 删除订单
+		a， 数据库中的事务
+		b， 面向切面编程思想
+	12， 在线支付
+		a， 银联支付
+	13， 销量排行榜
+
+
+分析数据库中的表
+	用户表：
+		用户id, 用户名，密码， 昵称， 电子邮箱， 激活状态， 角色， 注册时间， 。。。
+	商品表：
+		商品id， 商品名称， 商品种类， 商品的价格， 商品的库存数量， 商品图片url地址， 对商品的简述， 。。。
+	订单表：
+		订单id， 下单时间， 收货地址， 支付状态， 订单金额， 用户id（也就是说， 是谁下的订单）， 。。。
+	订单项：
+		订单id， 商品id， 购买数量
+
+
+	表间关系：
+		用户表 -- 订单表
+		1         多
+
+		商品表 -- 订单表
+		多        多
+
+创建数据库：
+	create database istore；
+
+创建用户：
+	create user lily indentified by 'lily123';
+
+为新创建的用户授权:
+	grant all on istore.* to lily;
+
+使用数据库：
+	use istore;
+
+创建表：
+	create table users(
+		id int primary key auto_increment,
+		username varchar(32),
+		password varchar(64),
+		nickname varchar(32),
+		email varchar(64),
+		role varchar(64),
+		state int,
+		activecode varchar(128),
+		updatetime timestamp		
+	);
+
+	create table products(
+		id varchar(128) primary key,
+		name varchar(64),
+		category varchar(64),
+		price double,
+		productnumber int,
+		imgurl varchar(128),
+		description varchar(512)
+	);
+
+	create table orders(
+		id varchar(128) primary key,
+		money double, 
+		receiveaddress varchar(512),
+		paystate int,
+		ordertime timestamp,
+		user_id int,
+
+		-- 外键
+		foreign key(user_id) references users(id)
+	);
+
+	create table orderitem(
+		order_id varchar(128),
+		product_id varchar(128),
+		buynumber int,
+
+		-- 联合主键, 拿两个主键的和来作为主键
+		primary key(order_id, product_id),		
+
+		-- 外键
+		foreign key(order_id) references orders(id),
+		foreign key(product_id) references products(id)
+
+	);
+
+
+在项目中经典的分包方式：
+	cn.itsource.istore.
+				domain
+				util
+				test
+				servlet
+				listener
+				filter
+				exception
+				tag
+				factory
+				dao
+				service
+
+导入我们需要的第三方jar包：
+	mysql驱动包	
+	dbutils包
+	c3p0包
+	jstl包
+	beanutils包
+	commons-fileupload包
+	
+	xpath包
+	dom4j包
+	log4j包
+
+写配置文件：
+	db.properties
+	c3p0-config.xml
+
+前端页面的开发
+
+前期准备：
+	工具类
+	工厂类实现解耦
+	全站乱码解决方案
+	权限限制问题
+	javabean
+
+
+用户注册：
+	index.jsp
+		如果用户还没有登录， 则提示“欢迎游客登录”， 并且有登录和注册选项
+		如果是已经登录的用户， 则提示“欢迎回来”
+	regist.jsp
+		提供注册页面， 提供验证码， 并且完成前端校验。   
+	ValidateServlet
+		服务器生成验证码到前端页面            
+	RegistServlet
+		a, 校验验证码
+		b，封装数据对象
+		c，调用Service方法注册用户
+		d，重定向到主页 
+	UserService
+		a， 校验用户是否已经被注册过， 如果被注册过， 则提示，
+			如果没有注册过， 则调用dao中的添加用户的方法，
+			同时发送一封激活电子邮件。
+	UserDAO
+		添加用户的方法
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
